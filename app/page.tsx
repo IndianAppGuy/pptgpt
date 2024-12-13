@@ -1,3 +1,4 @@
+// Frontend: app/page.tsx
 "use client"
 
 import { useState } from 'react';
@@ -5,81 +6,56 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UploadButton } from '../components/upload-button';
 import { cn } from "@/lib/utils";
+import { Document, Page } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
-  const [isStarted, setIsStarted] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState('');
-  const [outline, setOutline] = useState('');
-  const [status, setStatus] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!prompt.trim()) return;
-
-    setIsLoading(true);
-    setOutline('');
-    setPdfUrl('');
-    setStatus('Generating outline...');
-    
-    try {
-      const formData = new FormData();
-      formData.append('prompt', prompt);
-      if (files.length > 0) {
-        files.forEach(file => formData.append('files', file));
-      }
-
-      // Get outline first
-      const outlineResponse = await fetch('/api/outline', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!outlineResponse.ok) throw new Error('Failed to generate outline');
-      
-      const outlineData = await outlineResponse.json();
-      if (outlineData.error) throw new Error(outlineData.error);
-      
-      setOutline(outlineData.outline);
-      setStatus('Generating PDF...');
-
-      // Generate PDF once we have the outline
-      const pdfResponse = await fetch('/api/pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ outline: outlineData.outline }),
-      });
-
-      if (!pdfResponse.ok) throw new Error('Failed to generate PDF');
-      
-      const pdfData = await pdfResponse.json();
-      if (pdfData.error) throw new Error(pdfData.error);
-
-      const pdfBlob = new Blob(
-        [Buffer.from(pdfData.pdf, 'base64')],
-        { type: 'application/pdf' }
-      );
-      const url = URL.createObjectURL(pdfBlob);
-      setPdfUrl(url);
-      setIsStarted(true);
-      setStatus('');
-
-    } catch (error) {
-      console.error('Error:', error);
-      setStatus('Error: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [status, setStatus] = useState('Generate');
+  const [isStarted, setIsStarted] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [numPages, setNumPages] = useState<number>(0);
 
   const handleFileUpload = (fileList: FileList | null) => {
     if (!fileList) return;
     const newFiles = Array.from(fileList);
     setFiles(prev => [...prev, ...newFiles]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatus('Generating...');
+    setIsStarted(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('prompt', prompt);
+      files.forEach(file => formData.append('files', file));
+
+      const response = await fetch('/api/generate-presentation', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Failed to generate presentation');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    } catch (error) {
+      console.error('Error:', error);
+      setStatus('Error');
+    } finally {
+      setIsLoading(false);
+      setStatus('Generate');
+    }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
   };
 
   return (
@@ -112,9 +88,9 @@ export default function Home() {
                 className="h-10 text-lg"
                 disabled={isLoading}
               />
-              <Button 
-                type="submit" 
-                size="lg" 
+              <Button
+                type="submit"
+                size="lg"
                 disabled={isLoading || !prompt.trim()}
               >
                 {isLoading ? status : "Generate"}
@@ -132,35 +108,25 @@ export default function Home() {
           )}
         </form>
 
-        {/* Error status display */}
-        {status && status.startsWith('Error') && (
-          <div className="mt-4 max-w-3xl mx-auto">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {status}
-            </div>
-          </div>
-        )}
-
-        {/* Outline display */}
-        {outline && (
-          <div className="mt-4 max-w-3xl mx-auto">
-            <div className="bg-muted p-4 rounded-lg">
-              <h2 className="text-lg font-semibold mb-2">Presentation Outline</h2>
-              <pre className="whitespace-pre-wrap text-sm">
-                {outline}
-              </pre>
-            </div>
-          </div>
-        )}
-
-        {/* PDF display */}
         {pdfUrl && (
-          <div className="mt-8 max-w-4xl mx-auto h-96 border rounded-lg overflow-hidden">
-            <iframe
-              src={pdfUrl}
-              className="w-full h-full"
-              title="Generated Presentation"
-            />
+          <div className="max-w-4xl mx-auto mt-8">
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              className="flex flex-col items-center"
+            >
+              {Array.from(new Array(numPages), (_, index) => (
+                <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
+                  <Page
+                    pageNumber={index + 1}
+                    width={800}
+                    className="bg-white"
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </div>
+              ))}
+            </Document>
           </div>
         )}
       </div>
