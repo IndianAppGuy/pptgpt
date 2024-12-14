@@ -1,4 +1,3 @@
-// Frontend: app/page.tsx
 "use client"
 
 import { useState } from 'react';
@@ -6,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UploadButton } from '../components/upload-button';
 import { cn } from "@/lib/utils";
-import { Document, Page } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
@@ -15,8 +12,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('Generate');
   const [isStarted, setIsStarted] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [numPages, setNumPages] = useState<number>(0);
+  const [presentationUrl, setPresentationUrl] = useState('');
 
   const handleFileUpload = (fileList: FileList | null) => {
     if (!fileList) return;
@@ -29,10 +25,12 @@ export default function Home() {
     setIsLoading(true);
     setStatus('Generating...');
     setIsStarted(true);
+    console.log(prompt);
 
     try {
       const formData = new FormData();
       formData.append('prompt', prompt);
+      console.log(prompt);
       files.forEach(file => formData.append('files', file));
 
       const response = await fetch('/api/generate-presentation', {
@@ -41,10 +39,11 @@ export default function Home() {
       });
 
       if (!response.ok) throw new Error('Failed to generate presentation');
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
+      
+      const data = await response.json();
+      console.log(data);
+      setPresentationUrl(data.url);
+      console.log(presentationUrl);
     } catch (error) {
       console.error('Error:', error);
       setStatus('Error');
@@ -52,10 +51,6 @@ export default function Home() {
       setIsLoading(false);
       setStatus('Generate');
     }
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
   };
 
   return (
@@ -97,8 +92,8 @@ export default function Home() {
               </Button>
             </div>
             <div className="flex gap-1">
-              <UploadButton type="file" onUpload={handleFileUpload} disabled={isLoading} />
-              <UploadButton type="image" onUpload={handleFileUpload} disabled={isLoading} />
+              <UploadButton type="file" onUpload={handleFileUpload}  />
+              <UploadButton type="image" onUpload={handleFileUpload}  />
             </div>
           </div>
           {files.length > 0 && (
@@ -108,25 +103,13 @@ export default function Home() {
           )}
         </form>
 
-        {pdfUrl && (
-          <div className="max-w-4xl mx-auto mt-8">
-            <Document
-              file={pdfUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              className="flex flex-col items-center"
-            >
-              {Array.from(new Array(numPages), (_, index) => (
-                <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
-                  <Page
-                    pageNumber={index + 1}
-                    width={800}
-                    className="bg-white"
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                  />
-                </div>
-              ))}
-            </Document>
+        {presentationUrl && (
+          <div className="max-w-3xl mx-auto mt-8">
+            <iframe 
+              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(presentationUrl)}`}
+              className="w-full h-[600px] border border-gray-200 rounded-lg"
+              frameBorder="0"
+            />
           </div>
         )}
       </div>

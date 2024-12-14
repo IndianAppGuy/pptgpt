@@ -1,262 +1,135 @@
-import PptxGenJS from "pptxgenjs";
-const pptx = new PptxGenJS();
+const pptx = require('pptxgenjs');
+const presentation = new pptx();
 
+// Theme setup
+presentation.layout = 'LAYOUT_WIDE';
+presentation.defineLayout({ name: 'CUSTOM', width: 13.333, height: 7.5 });
 
-pptx.defineSlideMaster({
-  title: "MASTER_SLIDE",
-  background: { color: "FFFFFF" },
-  objects: [
-    {
-      placeholder: {
-        options: { name: "title", type: "title", x: 0.5, y: 0.7, w: 9, h: 0.8 },
-        text: "",
-      },
+const THEME = {
+    colors: {
+        primary: '1a237e',
+        secondary: '0091ea',
+        accent: '9e9e9e',
+        highlight: '00bcd4',
+        text: 'ffffff'
     },
-  ],
-});
+    fonts: {
+        heading: 'Orbitron',
+        subheading: 'Rajdhani',
+        body: 'Roboto'
+    }
+};
 
 // Title Slide
-let slide1 = pptx.addSlide();
-slide1.background = { path: "https://images.unsplash.com/photo-1501854140801-50d01698950b" };
-slide1.addText("Nature & Wildlife", {
-  x: 0.5,
-  y: 2,
-  w: 9,
-  h: 2,
-  fontSize: 72,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-  align: "center",
+let slide = presentation.addSlide();
+slide.background = { path: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb' };
+slide.addText('7 Sci-fi AI and Robotics', {
+    x: 0.5,
+    y: 0.5,
+    w: '90%',
+    h: 1.5,
+    fontSize: 72,
+    color: THEME.colors.text,
+    fontFace: THEME.fonts.heading,
+    align: 'center',
+    bold: true,
+    glow: { size: 10, color: THEME.colors.highlight, opacity: 0.5 }
 });
-slide1.addText("An Exploration of Earth's Beauty", {
-  x: 0.5,
-  y: 4,
-  w: 9,
-  h: 1,
-  fontSize: 36,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  align: "center",
-});
-
-// Forest Ecosystems Slide
-let slide2 = pptx.addSlide();
-slide2.background = { color: "1A472A" };
-slide2.addText("Forest Ecosystems", {
-  x: 0.5,
-  y: 0.5,
-  w: 9,
-  h: 0.8,
-  fontSize: 44,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-});
-slide2.addImage({
-  path: "https://images.unsplash.com/photo-1511497584788-876760111969",
-  x: 0.5,
-  y: 1.5,
-  w: 4.3,
-  h: 3.2,
-});
-slide2.addImage({
-  path: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d",
-  x: 5.2,
-  y: 1.5,
-  w: 4.3,
-  h: 3.2,
-});
-slide2.addText([
-  { text: "• Home to 80% of terrestrial biodiversity", fontSize: 20, bullet: true },
-  { text: "• Crucial for climate regulation", fontSize: 20, bullet: true },
-  { text: "• Provides habitat for countless species", fontSize: 20, bullet: true },
-], {
-  x: 0.5,
-  y: 5,
-  w: 9,
-  h: 1.5,
-  color: "FFFFFF",
-  fontFace: "Arial",
+slide.addText('in Defence for 2025', {
+    x: 0.5,
+    y: 2.2,
+    w: '90%',
+    h: 1,
+    fontSize: 48,
+    color: THEME.colors.text,
+    fontFace: THEME.fonts.subheading,
+    align: 'center'
 });
 
-// Marine Life Slide
-let slide3 = pptx.addSlide();
-slide3.background = { color: "003366" };
-slide3.addText("Marine Ecosystems", {
-  x: 0.5,
-  y: 0.5,
-  w: 9,
-  h: 0.8,
-  fontSize: 44,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-});
-slide3.addShape(pptx.ShapeType.rect, {
-  x: 0.5,
-  y: 1.5,
-  w: 9,
-  h: 3.5,
-  fill: { type: "solid", color: "FFFFFF", alpha: 10 },
-});
-slide3.addImage({
-  path: "https://images.unsplash.com/photo-1544552866-d3ed42536d1f",
-  x: 1,
-  y: 1.8,
-  w: 8,
-  h: 3,
-});
-slide3.addText([
-  { text: "Oceans cover 71% of Earth's surface", fontSize: 20 },
-  { text: "Contains 97% of Earth's water", fontSize: 20 },
-  { text: "Home to millions of species", fontSize: 20 },
-], {
-  x: 0.5,
-  y: 5.2,
-  w: 9,
-  h: 1.2,
-  color: "FFFFFF",
-  fontFace: "Arial",
-  bullet: true,
+// Technology Slides
+const technologies = [
+    {
+        title: 'Autonomous Combat Drones',
+        image: 'https://images.unsplash.com/photo-1589254065878-42c9da997008',
+        description: 'Next-generation autonomous drones with advanced AI capabilities'
+    },
+    {
+        title: 'AI-Powered Battlefield Analysis',
+        image: 'https://images.unsplash.com/photo-1607723619359-27a6e3f0b116',
+        description: 'Real-time strategic analysis using artificial intelligence'
+    },
+    {
+        title: 'Robotic Combat Units',
+        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
+        description: 'Advanced robotic units for high-risk combat scenarios'
+    },
+    {
+        title: 'Neural Interface Systems',
+        image: 'https://images.unsplash.com/photo-1589254065878-42c9da997008',
+        description: 'Direct neural control systems for military equipment'
+    },
+    {
+        title: 'Quantum Computing Defense',
+        image: 'https://images.unsplash.com/photo-1607723619359-27a6e3f0b116',
+        description: 'Quantum-powered cybersecurity and encryption systems'
+    },
+    {
+        title: 'AI Cyber Defense Networks',
+        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
+        description: 'Self-learning networks for advanced cyber warfare'
+    },
+    {
+        title: 'Smart Combat Armor',
+        image: 'https://images.unsplash.com/photo-1589254065878-42c9da997008',
+        description: 'AI-enhanced protective systems with reactive capabilities'
+    }
+];
+
+technologies.forEach((tech, index) => {
+    let slide = presentation.addSlide();
+    
+    // Background with gradient overlay
+    slide.background = { 
+        color: THEME.colors.primary,
+        gradient: {
+            type: 'linear',
+            stops: [
+                { color: THEME.colors.primary, position: 0 },
+                { color: THEME.colors.secondary, position: 100 }
+            ]
+        }
+    };
+
+    // Left side: Image
+    slide.addImage({
+        path: tech.image,
+        x: 0,
+        y: 0,
+        w: '50%',
+        h: '100%',
+        sizing: { type: 'cover' }
+    });
+
+    // Right side: Content
+    slide.addText(`${index + 1}. ${tech.title}`, {
+        x: '52%',
+        y: '20%',
+        w: '45%',
+        fontSize: 44,
+        color: THEME.colors.text,
+        fontFace: THEME.fonts.heading,
+        bold: true
+    });
+
+    slide.addText(tech.description, {
+        x: '52%',
+        y: '40%',
+        w: '45%',
+        fontSize: 32,
+        color: THEME.colors.text,
+        fontFace: THEME.fonts.body
+    });
 });
 
-// Wildlife Diversity Slide
-let slide4 = pptx.addSlide();
-slide4.background = { color: "4A2545" };
-slide4.addText("Wildlife Diversity", {
-  x: 0.5,
-  y: 0.5,
-  w: 9,
-  h: 0.8,
-  fontSize: 44,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-});
-slide4.addImage({
-  path: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7",
-  x: 0.5,
-  y: 1.5,
-  w: 2.8,
-  h: 3.5,
-});
-slide4.addImage({
-  path: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46",
-  x: 3.6,
-  y: 1.5,
-  w: 2.8,
-  h: 3.5,
-});
-slide4.addImage({
-  path: "https://images.unsplash.com/photo-1531959870249-9f9b729efcf4",
-  x: 6.7,
-  y: 1.5,
-  w: 2.8,
-  h: 3.5,
-});
-slide4.addText("8.7 Million Species Estimated Globally", {
-  x: 0.5,
-  y: 5.2,
-  w: 9,
-  h: 0.5,
-  fontSize: 24,
-  color: "FFFFFF",
-  fontFace: "Arial",
-  align: "center",
-});
-
-// Conservation Slide
-let slide5 = pptx.addSlide();
-slide5.background = { color: "2F4F4F" };
-slide5.addText("Conservation Efforts", {
-  x: 0.5,
-  y: 0.5,
-  w: 9,
-  h: 0.8,
-  fontSize: 44,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-});
-slide5.addShape(pptx.ShapeType.rect, {
-  x: 0.5,
-  y: 1.5,
-  w: 4.3,
-  h: 3.2,
-  fill: { type: "solid", color: "FFFFFF", alpha: 10 },
-});
-slide5.addText([
-  { text: "Current Challenges:", fontSize: 24, bold: true },
-  { text: "• Climate Change", fontSize: 20, bullet: true },
-  { text: "• Habitat Loss", fontSize: 20, bullet: true },
-  { text: "• Pollution", fontSize: 20, bullet: true },
-  { text: "• Overexploitation", fontSize: 20, bullet: true },
-], {
-  x: 0.7,
-  y: 1.7,
-  w: 3.9,
-  h: 2.8,
-  color: "FFFFFF",
-  fontFace: "Arial",
-});
-slide5.addShape(pptx.ShapeType.rect, {
-  x: 5.2,
-  y: 1.5,
-  w: 4.3,
-  h: 3.2,
-  fill: { type: "solid", color: "FFFFFF", alpha: 10 },
-});
-slide5.addText([
-  { text: "Solutions:", fontSize: 24, bold: true },
-  { text: "• Protected Areas", fontSize: 20, bullet: true },
-  { text: "• Species Recovery Programs", fontSize: 20, bullet: true },
-  { text: "• Sustainable Practices", fontSize: 20, bullet: true },
-  { text: "• Education & Awareness", fontSize: 20, bullet: true },
-], {
-  x: 5.4,
-  y: 1.7,
-  w: 3.9,
-  h: 2.8,
-  color: "FFFFFF",
-  fontFace: "Arial",
-});
-slide5.addText("Together We Can Make a Difference", {
-  x: 0.5,
-  y: 5.2,
-  w: 9,
-  h: 0.5,
-  fontSize: 28,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  align: "center",
-  bold: true,
-});
-
-// Final Call to Action Slide
-let slide6 = pptx.addSlide();
-slide6.background = { path: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e" };
-slide6.addText("Protect Our Natural World", {
-  x: 0.5,
-  y: 2,
-  w: 9,
-  h: 1.5,
-  fontSize: 64,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  bold: true,
-  align: "center",
-});
-slide6.addText("Every Action Counts", {
-  x: 0.5,
-  y: 3.5,
-  w: 9,
-  h: 0.8,
-  fontSize: 36,
-  color: "FFFFFF",
-  fontFace: "Montserrat",
-  align: "center",
-});
-
-// Save the presentation
-pptx.writeFile("Nature_and_Wildlife_11.pptx");
+// Save presentation
+presentation.writeFile('sdq3222qwrew.pptx');
