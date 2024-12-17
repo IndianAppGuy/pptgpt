@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     
     const pptId = randomUUID();
     const fileName = `${pptId}.pptx`;
-    const filePath = path.join(process.cwd(), '/tmp', fileName);
+    const filePath = path.join('/tmp', fileName);
     
     // Generate presentation using Claude
     const msg = await anthropic.messages.create({
