@@ -14,7 +14,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export const maxDuration = 900;
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     
     const pptId = randomUUID();
     const fileName = `${pptId}.pptx`;
-    const filePath = path.join(process.cwd(), 'tmp', fileName);
+    const filePath = path.join(process.cwd(), '/tmp', fileName);
     
     // Generate presentation using Claude
     const msg = await anthropic.messages.create({
