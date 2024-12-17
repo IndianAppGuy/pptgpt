@@ -5,9 +5,8 @@ import { readFile, unlink } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { createClient } from '@supabase/supabase-js';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import PptxGenJS from "pptxgenjs";
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-require-imports
+const PptxGenJS = require("pptxgenjs");
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
     });
 
     const resp = (msg.content[0] as Anthropic.TextBlock).text;
-    const code = `
+    const code = `const PptxGenJS = require("pptxgenjs");
     const pptx = new PptxGenJS();
     ${resp}`;
     
