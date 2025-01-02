@@ -44,11 +44,11 @@ export async function POST(req: NextRequest) {
     const toneOfVoice = formData.get('toneOfVoice') as string;
     const numberOfSlides = formData.get('numberOfSlides') as string;
     const useGoogleContent = formData.get('useGoogleContent') === 'true';
-    
+
     const anthropic = new Anthropic({
       apiKey: process.env["ANTHROPIC_API_KEY"],
     });
-    
+
     const pptId = randomUUID();
     const fileName = `${pptId}.pptx`;
     const filePath = path.join('/tmp', fileName);
